@@ -80,7 +80,7 @@
 
       results.forEach(r => {
         const li = document.createElement('li');
-        li.textContent = `${r.pair})`;
+        li.textContent = `${r.pair}) (점수: ${r.score.toFixed(3)})`;
         resultList.appendChild(li);
       });
     }
