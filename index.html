@@ -49,14 +49,17 @@
     };
 
     function calculate() {
-      const speedWeight = parseFloat(document.getElementById('speedWeight').value);
-      const costWeight = parseFloat(document.getElementById('costWeight').value);
+      const speedW = parseFloat(document.getElementById('speedWeight').value);
+      const costW = parseFloat(document.getElementById('costWeight').value);
       const resultList = document.getElementById('result');
       resultList.innerHTML = '';
 
-      if (isNaN(speedWeight) || isNaN(costWeight) || (speedWeight + costWeight).toFixed(2) !== "1.00") {
-        resultList.innerHTML = '<li>가중치의 합이 1이 되도록 입력하세요.</li>';
-        return;
+      const speedWeight = speedW/(speedW+costW)
+      const costWeight = costW/(speedW+costW)
+
+      // if (isNaN(speedWeight) || isNaN(costWeight) || (speedWeight + costWeight).toFixed(2) !== "1.00") {
+      //   resultList.innerHTML = '<li>가중치의 합이 1이 되도록 입력하세요.</li>';
+      //   return;
       }
 
       const results = [];
@@ -80,7 +83,7 @@
 
       results.forEach(r => {
         const li = document.createElement('li');
-        li.textContent = `${r.pair}) (점수: ${r.score.toFixed(3)})`;
+        li.textContent = `${r.pair} (점수: ${r.score.toFixed(3)})`;
         resultList.appendChild(li);
       });
     }
