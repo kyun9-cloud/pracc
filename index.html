@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>확장된 최적 인스턴스 계산기</title>
+  <title>최적 인스턴스 계산기 (동일 타입 전용)</title>
   <style>
     body { font-family: Arial; padding: 20px; text-align: center; }
     input { padding: 10px; margin: 10px; font-size: 16px; width: 100px; }
@@ -12,13 +12,13 @@
   </style>
 </head>
 <body>
-  <h1>확장된 최적 인스턴스 계산기</h1>
+  <h1>최적 인스턴스 계산기</h1>
   <p>속도 가중치와 비용 가중치를 입력하세요 (합은 1)</p>
   <input type="number" id="speedWeight" placeholder="속도 가중치" step="0.01" min="0" max="1" />
   <input type="number" id="costWeight" placeholder="비용 가중치" step="0.01" min="0" max="1" />
   <br>
   <button onclick="calculate()">계산</button>
-  <h2>추천 경로</h2>
+  <h2>추천 경로 (동일 타입만)</h2>
   <ul id="result"></ul>
 
   <script>
@@ -31,14 +31,21 @@
       { region: '미국', type: 't2',  cost: 12 },
     ];
 
-    // 지역 간 속도값 (송신 → 수신)
+    // 동일 타입 (c7g↔c7g, t2↔t2) 사이의 송수신 속도만 정의
     const speedMap = {
-      '서울-일본': 10,
-      '서울-미국': 20,
-      '미국-일본': 10,
-      '미국-서울': 10,
-      '일본-서울': 20,
-      '일본-미국': 20
+      '서울-c7g→일본-c7g': 2.848,
+      '서울-c7g→미국-c7g': 0.689,
+      '일본-c7g→서울-c7g': 2.884,
+      '일본-c7g→미국-c7g': 0.761,
+      '미국-c7g→서울-c7g': 0.678,
+      '미국-c7g→일본-c7g': 0.752,
+
+      '서울-t2→일본-t2': 0.5,
+      '서울-t2→미국-t2': 0.089,
+      '일본-t2→서울-t2': 0.529,
+      '일본-t2→미국-t2': 0.103,
+      '미국-t2→서울-t2': 0.102,
+      '미국-t2→일본-t2': 0.094,
     };
 
     function calculate() {
@@ -47,7 +54,7 @@
       const resultList = document.getElementById('result');
       resultList.innerHTML = '';
 
-      if (isNaN(speedWeight) || isNaN(costWeight) || (speedWeight + costWeight).toFixed(2) != "1.00") {
+      if (isNaN(speedWeight) || isNaN(costWeight) || (speedWeight + costWeight).toFixed(2) !== "1.00") {
         resultList.innerHTML = '<li>가중치의 합이 1이 되도록 입력하세요.</li>';
         return;
       }
@@ -57,9 +64,10 @@
       for (const sender of instances) {
         for (const receiver of instances) {
           if (sender === receiver) continue;
+          if (sender.type !== receiver.type) continue; // 동일 타입만
 
-          const speedKey = `${sender.region}-${receiver.region}`;
-          const speed = speedMap[speedKey];
+          const key = `${sender.region}-${sender.type}→${receiver.region}-${receiver.type}`;
+          const speed = speedMap[key];
           if (speed === undefined) continue;
 
           const score = (speed * speedWeight) + ((1 / sender.cost) * costWeight);
