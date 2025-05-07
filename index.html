@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>최적 인스턴스 계산기</title>
+  <title>확장된 최적 인스턴스 계산기</title>
   <style>
     body { font-family: Arial; padding: 20px; text-align: center; }
     input { padding: 10px; margin: 10px; font-size: 16px; width: 100px; }
@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h1>최적 인스턴스 계산기</h1>
+  <h1>확장된 최적 인스턴스 계산기</h1>
   <p>속도 가중치와 비용 가중치를 입력하세요 (합은 1)</p>
   <input type="number" id="speedWeight" placeholder="속도 가중치" step="0.01" min="0" max="1" />
   <input type="number" id="costWeight" placeholder="비용 가중치" step="0.01" min="0" max="1" />
@@ -22,7 +22,17 @@
   <ul id="result"></ul>
 
   <script>
-    const speeds = {
+    const instances = [
+      { region: '서울', type: 'c7g', cost: 4 },
+      { region: '서울', type: 't2',  cost: 6 },
+      { region: '일본', type: 'c7g', cost: 14 },
+      { region: '일본', type: 't2',  cost: 16 },
+      { region: '미국', type: 'c7g', cost: 8 },
+      { region: '미국', type: 't2',  cost: 12 },
+    ];
+
+    // 지역 간 속도값 (송신 → 수신)
+    const speedMap = {
       '서울-일본': 10,
       '서울-미국': 20,
       '미국-일본': 10,
@@ -31,33 +41,31 @@
       '일본-미국': 20
     };
 
-    const costs = {
-      '서울': 5,
-      '미국': 10,
-      '일본': 15
-    };
-
     function calculate() {
       const speedWeight = parseFloat(document.getElementById('speedWeight').value);
       const costWeight = parseFloat(document.getElementById('costWeight').value);
-
       const resultList = document.getElementById('result');
       resultList.innerHTML = '';
 
-      if (isNaN(speedWeight) || isNaN(costWeight) || speedWeight + costWeight !== 1) {
+      if (isNaN(speedWeight) || isNaN(costWeight) || (speedWeight + costWeight).toFixed(2) != "1.00") {
         resultList.innerHTML = '<li>가중치의 합이 1이 되도록 입력하세요.</li>';
         return;
       }
 
       const results = [];
 
-      for (const key in speeds) {
-        const [sender, receiver] = key.split('-');
-        const speed = speeds[key];
-        const cost = costs[sender];
+      for (const sender of instances) {
+        for (const receiver of instances) {
+          if (sender === receiver) continue;
 
-        const score = (speed * speedWeight) + ((1 / cost) * costWeight);
-        results.push({ pair: `${sender} → ${receiver}`, score: score });
+          const speedKey = `${sender.region}-${receiver.region}`;
+          const speed = speedMap[speedKey];
+          if (speed === undefined) continue;
+
+          const score = (speed * speedWeight) + ((1 / sender.cost) * costWeight);
+          const pair = `${sender.region}-${sender.type} → ${receiver.region}-${receiver.type}`;
+          results.push({ pair, score });
+        }
       }
 
       results.sort((a, b) => b.score - a.score);
