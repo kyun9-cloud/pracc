@@ -13,12 +13,12 @@
 </head>
 <body>
   <h1>최적 인스턴스 계산기</h1>
-  <p>속도 가중치와 비용 가중치를 입력하세요 (합은 1)</p>
+  <p>속도 가중치와 비용 가중치를 입력하세요</p>
   <input type="number" id="speedWeight" placeholder="속도 가중치" step="0.01" min="0" max="1" />
   <input type="number" id="costWeight" placeholder="비용 가중치" step="0.01" min="0" max="1" />
   <br>
   <button onclick="calculate()">계산</button>
-  <h2>추천 경로 (동일 타입만)</h2>
+  <h2>추천 경로</h2>
   <ul id="result"></ul>
 
   <script>
@@ -54,8 +54,8 @@
       const resultList = document.getElementById('result');
       resultList.innerHTML = '';
 
-      const speedWeight = speedW/(speedW+costW)
-      const costWeight = costW/(speedW+costW)
+      const speedWeight = speedW / (speedW + costW)
+      const costWeight = costW / (speedW + costW)
 
       // if (isNaN(speedWeight) || isNaN(costWeight) || (speedWeight + costWeight).toFixed(2) !== "1.00") {
       //   resultList.innerHTML = '<li>가중치의 합이 1이 되도록 입력하세요.</li>';
